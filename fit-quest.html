@@ -1,109 +1,24 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Фит-квест</title><style>
-:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f3f5fb;--c:#fff;--t:#1a2033;--m:#68718f;--a:#5468ff;--g:#12b76a;--b:#e2e6f3}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0d1120;--c:#161c30;--t:#edf0ff;--m:#97a0c6;--a:#7d8cff;--g:#32d583;--b:#262e4b}}
-:root[data-theme=dark]{--bg:#0d1120;--c:#161c30;--t:#edf0ff;--m:#97a0c6;--a:#7d8cff;--g:#32d583;--b:#262e4b}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--c)}
-header{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--c);border-bottom:1px solid var(--b);padding:10px 14px 8px}
-.w{max-width:620px;margin:auto}main{padding:12px 14px 40px}
-.lv{display:flex;gap:12px;align-items:center}.lv>b{flex:none;width:46px;height:46px;border-radius:50%;background:var(--a);color:#fff;display:grid;place-items:center;font-size:21px}
-.lv>div{flex:1}.bar{height:8px;border-radius:9px;background:var(--b);overflow:hidden;margin:4px 0 2px}.bar i{display:block;height:100%;background:var(--g)}
-small,.m{color:var(--m);font-size:12.5px}.tabs{display:flex;gap:8px;margin-top:8px}
-button,select,input{font:inherit;color:inherit}
-button,select{border:1px solid var(--b);background:var(--c);border-radius:10px;padding:7px 12px;cursor:pointer}
-.tabs button{flex:1}.on{background:var(--a)!important;color:#fff!important;border-color:var(--a)!important}
-.p{background:var(--g);color:#fff;border:0}.row{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;align-items:center}
-.c{background:var(--c);border:1px solid var(--b);border-radius:14px;margin:8px 0}
-.h{display:flex;gap:10px;align-items:center;padding:11px 12px;cursor:pointer}.h>div{flex:1}
-.ck{flex:none;width:28px;height:28px;border-radius:50%;border:2px solid var(--b);display:grid;place-items:center;color:#fff}
-.ok .ck{background:var(--g);border-color:var(--g)}.ok{border-color:var(--g)}
-.n i{color:var(--a);font-style:normal}.bd{padding:0 12px 12px}.bd p{margin:0 0 8px}
-input[type=number],input[type=date]{width:64px;padding:7px;border:1px solid var(--b);border-radius:8px;background:var(--bg)}input[type=date]{width:auto}
-.g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.g>div{background:var(--c);border:1px solid var(--b);border-radius:12px;padding:8px;text-align:center}.g b{display:block;font-size:20px}
-svg{width:100%;height:auto;display:block}svg text{fill:var(--m);font-size:9px}
-pre{white-space:pre-wrap;font-family:inherit;font-size:13px;line-height:1.5;background:var(--c);border:1px solid var(--b);border-radius:12px;padding:10px}
-details{margin:10px 0}h3{margin:16px 0 4px;font-size:15px}
-</style></head><body><header><div class="w"><div id="hd"></div><div class="tabs"><button data-a="t" data-i="t">Сегодня</button><button data-a="t" data-i="r">Отчёт</button></div></div></header><main class="w" id="m"></main><script>
-const $=s=>document.querySelector(s),K='fq1',P=v=>parseInt(v)||0,
-dk=d=>{d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')},
-pd=k=>{const a=k.split('-');return new Date(a[0],a[1]-1,a[2])},
-add=(k,n)=>{const d=pd(k);d.setDate(d.getDate()+n);return dk(d)},
-N={A:'Силовая A',B:'Силовая B',M:'Мини-15',C:'Кардио',R:'Отдых'},
-D={A:['wu','sq','pu','br','gb','pl','cr'],B:['wu','lg','rd','pk','tr','dd','sp','ca'],M:['sq','pu','br','pl'],C:['rn'],R:[]},
-PO=['ch','an','yr','pc'],TT=['Новичок','Ученик','Боец','Атлет','Воин','Титан'],
-RULES='<details class="c bd" style="padding-top:12px"><summary><b>Правила прогрессии</b></summary><p>Оставляй 1–2 повтора «в запасе». Когда во всех подходах дошёл до верхней границы диапазона — нажми «⬆ Сложнее» (или добавь вес в рюкзак) и начни с нижней границы.</p><p>Пропустил день — делай следующую по очереди, без «двойных» нагрузок. Нет времени — выбери «Мини-15». Раз в неделю взвешивайся (вкладка «Отчёт»).</p></details>',
-X={
-wu:{n:'Разминка',s:1,r:'5',u:'мин',h:'1 минута марша или «звёздочек», круги плечами и руками, 10 приседаний без веса, 10 лопаточных отжиманий (в упоре на прямых руках сводишь и разводишь лопатки), 8 «кошка–корова».'},
-sq:{n:'Приседания с рюкзаком',s:3,r:'10–15',u:'пов',h:'Рюкзак у груди двумя руками. Ноги чуть шире плеч, колени смотрят туда же, куда носки, спина прямая. Садись до параллели бёдер с полом, пятки на полу.',L:['Без веса','С рюкзаком','Болгарские сплит-приседания','«Пистолет» с опорой']},
-pu:{n:'Отжимания',s:3,r:'8–15',u:'пов',h:'Тело — прямая линия от головы до пяток, таз не провисает. Локти под ~45° к корпусу, грудь почти касается пола.',L:['Руки на столе','Обычные','Ноги на стуле','Узкие («алмаз»)','«Лучник»']},
-br:{n:'Тяга рюкзака в наклоне',s:3,r:'10–12',u:'пов',p:'на руку',h:'Свободной рукой упрись в стул, спина ровная. Тяни локоть к поясу, в верхней точке сведи лопатку на 1 секунду. Главное упражнение против сутулости.'},
-gb:{n:'Ягодичный мостик',s:3,r:'12–15',u:'пов',h:'Лёжа на спине, стопы у таза. Подними таз до прямой линии плечи–таз–колени и сожми ягодицы.',L:['Двумя ногами','Одной ногой','Одной, стопа на стуле']},
-pl:{n:'Планка',s:3,r:'30–45',u:'с',h:'Локти под плечами, тело прямое, пресс и ягодицы напряжены, поясница не прогибается.'},
-cr:{n:'Переноска груза',s:3,r:'30–40',u:'с',h:'Две сумки с книгами или водой по 5–10 кг. Иди с прямой спиной и опущенными плечами. Тренирует хват и корпус — основу для «поднимать тяжести и людей».'},
-lg:{n:'Выпады назад с рюкзаком',s:3,r:'8–12',u:'пов',p:'на ногу',h:'Шаг назад, колено задней ноги почти касается пола, пятка передней прижата, корпус прямой.'},
-rd:{n:'Румынская тяга с рюкзаком',s:3,r:'10–15',u:'пов',h:'Колени чуть согнуты, спина ровная, таз уходит назад, рюкзак скользит вдоль ног до середины голени. Вверх — сжимая ягодицы.'},
-pk:{n:'Пайк-отжимания',s:3,r:'6–12',u:'пов',h:'Таз высоко («горка»), сгибай локти, голова идёт к полу между рук. Нагружает плечи.'},
-tr:{n:'Тяга лёжа под столом',s:3,r:'6–12',u:'пов',h:'Ляг под тяжёлый устойчивый стол (не стеклянный и не на колёсиках), возьмись за край, подтяни грудь к столу, тело прямое.',L:['Колени согнуты','Ноги прямые','Ноги на стуле','Подтягивания на турнике']},
-dd:{n:'«Мёртвый жук»',s:3,r:'8–10',u:'пов',p:'на сторону',h:'Лёжа на спине, руки вверх, ноги согнуты на 90°. Опускай противоположные руку и ногу, поясница прижата к полу.'},
-sp:{n:'Боковая планка',s:2,r:'20–30',u:'с',p:'на сторону',h:'Упор на предплечье, тело — прямая линия, таз не проваливается.'},
-ca:{n:'Подъёмы на носки',s:3,r:'15–20',u:'пов',h:'Встань носками на ступеньку, придерживаясь за стену. Медленно вниз до растяжения, вверх — на максимум.'},
-rn:{n:'Лёгкий бег / быстрая ходьба',s:1,r:'25–40',u:'мин',h:'Темп разговорный: можешь говорить целыми фразами. Недели 1–2: 1 мин бега + 2 мин ходьбы × 8. Недели 3–4: 2 + 1 × 8. Недели 5–6: 5 + 1 × 4. Недели 7–8: 10 + 1 × 3. Дальше — 25–30 минут без остановки.'},
-ch:{n:'Подбородок к стене',s:2,r:'10',u:'пов',x:5,h:'Затылок прижат к стене, втяни подбородок назад («двойной подбородок») и держи 3 секунды.'},
-an:{n:'«Ангелы» у стены',s:2,r:'10',u:'пов',x:5,h:'Спина, локти и кисти касаются стены. Веди руки вверх–вниз, не отрывая их от стены.'},
-yr:{n:'Y-подъёмы лёжа',s:2,r:'8–10',u:'пов',x:5,h:'Лёжа на животе, руки буквой Y, большие пальцы вверх. Поднимай руки от пола, сводя лопатки.'},
-pc:{n:'Растяжка груди в проёме',s:2,r:'30',u:'с',p:'на сторону',x:5,h:'Предплечье на косяке двери, шаг вперёд, грудь раскрывается. Держи 30 секунд, дыши ровно.'}};
-let S={days:{},w:[],st:{}},cur=dk(),td0=cur,tab='t',op=null,col=null,R={p:'7',ex:'pu'};const tm={};
-try{Object.assign(S,JSON.parse(localStorage.getItem(K)))}catch(e){}
-const ls=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}},
-sv=k=>{ls();if(!col)return;clearTimeout(tm[k]);tm[k]=setTimeout(()=>col.doc('d-'+k).set({t:S.days[k].t,e:S.days[k].e}).catch(()=>{}),400)},
-sm=()=>{ls();if(col){clearTimeout(tm.m);tm.m=setTimeout(()=>col.doc('meta').set({w:S.w,st:S.st}).catch(()=>{}),400)}},
-ok=(d,id)=>!!(d&&d.e[id]&&d.e[id].d),dn=d=>Object.values(d.e||{}).filter(x=>x.d).length,
-ms=d=>D[d.t].some(id=>ok(d,id)),act=k=>!!S.days[k]&&dn(S.days[k])>0,
-nxt=k=>{const p=Object.keys(S.days).filter(j=>j<k&&'AB'.includes(S.days[j].t)&&ms(S.days[j])).sort().pop();return p&&S.days[p].t=='A'?'B':'A'},
-typ=k=>{if(S.days[k])return S.days[k].t;const w=pd(k).getDay();return w%2&&w<6?nxt(k):w==2||w==6?'C':'R'},
-xe=(id,e)=>{const x=X[id];return e.d&&x?(x.u=='мин'?2*(e.s[0]||0):e.s.length*(x.x||10)):0},
-dx=k=>{const d=S.days[k];if(!d)return 0;let n=0;for(const id in d.e)n+=xe(id,d.e[id]);const L=D[d.t];return n+(L.length&&L.every(id=>ok(d,id))?50:0)},
-tx=()=>Object.keys(S.days).reduce((a,k)=>a+dx(k),0),
-sk=()=>{let k=dk(),n=0;if(!act(k))k=add(k,-1);while(act(k)){n++;k=add(k,-1)}return n},
-tg=(id,t)=>{const x=X[id],n=t=='M'?2:x.s,u=x.u=='пов'?'':' '+x.u;return(n>1?n+' × ':'')+x.r+u+(x.p?' '+x.p:'')},
-lb=k=>k.slice(8)+'.'+k.slice(5,7);
-function head(){const x=tx(),l=Math.floor(Math.sqrt(x/60))+1,a=60*(l-1)**2,b=60*l*l;$('#hd').innerHTML=`<div class="lv"><b>${l}</b><div><div><b>${TT[Math.min(5,(l-1)/3|0)]}</b> · ${x} XP</div><div class="bar"><i style="width:${100*(x-a)/(b-a)}%"></i></div><small>До уровня ${l+1}: ${b-x} XP · 🔥 серия: ${sk()} дн.</small></div></div>`;document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.i==tab))}
-function card(id,k,t){const x=X[id],d=S.days[k],e=d&&d.e[id],done=ok(d,id),o=op==id,n=t=='M'?2:x.s,v=e?e.s:Array(n).fill(P(x.r)),l=x.L,st=Math.min(S.st[id]||0,l?l.length-1:0);
-return`<div class="c${done?' ok':''}"><div class="h" data-a="o" data-i="${id}"><span class="ck" data-a="q" data-i="${id}">${done?'✓':''}</span><div><div>${x.n}${l?' · <span class="n"><i>'+l[st]+'</i></span>':''}</div><small>${tg(id,t)}${done?' · сделано: '+e.s.join(' · '):''}</small></div><span class="m">${o?'▴':'▾'}</span></div>`+(o?`<div class="bd"><p>${x.h}</p>${l?`<div class="row"><small>Ступень ${st+1}/${l.length}</small><button data-a="ld" data-i="${id}" data-d="-1">⬇ Проще</button><button data-a="ld" data-i="${id}" data-d="1">⬆ Сложнее</button></div>`:''}<div class="row">${v.map(z=>`<input type="number" inputmode="numeric" min="0" value="${z}">`).join('')}<button data-a="+">＋ подход</button></div><div class="row"><button class="p" data-a="s" data-i="${id}">Сохранить: выполнено</button>${e?`<button data-a="r" data-i="${id}">Сбросить</button>`:''}</div></div>`:'')+'</div>'}
-function today(){const t=typ(cur),d=S.days[cur],L=D[t],s=pd(cur).toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'}),c=l=>l.filter(id=>ok(d,id)).length;
-return`<div class="row"><button data-a="dn" data-i="-1">◀</button><b style="flex:1;text-align:center">${s[0].toUpperCase()+s.slice(1)}</b><button data-a="dn" data-i="1">▶</button></div>${cur!=dk()?'<div class="row"><button data-a="dn" data-i="0">К сегодняшнему дню</button></div>':''}<div class="row">${Object.keys(N).map(z=>`<button class="${z==t?'on':''}" data-a="ty" data-i="${z}">${N[z]}</button>`).join('')}</div>`+(L.length?`<small>Основная часть: ${c(L)} из ${L.length}</small>`+L.map(i=>card(i,cur,t)).join(''):'<div class="c bd" style="padding-top:12px">День отдыха: мышцы растут именно сейчас. Сделай 5 минут осанки ниже и ложись спать вовремя.</div>')+`<small>Осанка (5 минут каждый день): ${c(PO)} из 4</small>`+PO.map(i=>card(i,cur,t)).join('')+RULES}
-const rg=()=>{const t=dk();if(R.p=='c')return[R.f,R.to];if(R.p=='all')return[Object.keys(S.days).sort()[0]||t,t];return[add(t,1-R.p),t]},
-ser=(id,f,t)=>Object.keys(S.days).filter(k=>k>=f&&k<=t).sort().filter(k=>{const e=S.days[k].e[id];return e&&e.d&&e.s.length}).map(k=>({k,v:Math.max(...S.days[k].e[id].s)})),
-bars=a=>{if(!a.length)return'';const m=Math.max(1,...a.map(x=>x.v)),w=300/a.length;return`<svg viewBox="0 0 300 120">`+a.map((x,i)=>`<rect x="${i*w+1}" y="${100-85*x.v/m}" width="${Math.max(1,w-2)}" height="${85*x.v/m}" rx="2" fill="var(--a)"/>`).join('')+`<text x="0" y="10">${m}</text><text x="0" y="116">${a[0].l}</text><text x="300" y="116" text-anchor="end">${a[a.length-1].l}</text></svg>`},
-line=(a,u)=>{if(a.length<2)return'<small>Пока мало данных: нужно хотя бы 2 записи.</small>';const v=a.map(x=>x.v),mn=Math.min(...v),mx=Math.max(...v),r=mx-mn||1,p=a.map((x,i)=>[8+i*284/(a.length-1),95-80*(x.v-mn)/r]);return`<svg viewBox="0 0 300 120"><polyline fill="none" stroke="var(--g)" stroke-width="2.5" points="${p.map(z=>z.join(',')).join(' ')}"/>${p.map(z=>`<circle cx="${z[0]}" cy="${z[1]}" r="3" fill="var(--g)"/>`).join('')}<text x="0" y="10">${mx}${u}</text><text x="0" y="116">${mn}${u} · ${lb(a[0].k)}</text><text x="300" y="116" text-anchor="end">${lb(a[a.length-1].k)}</text></svg>`};
-function rep(){const[f,t]=rg(),ks=Object.keys(S.days).filter(k=>k>=f&&k<=t),days=Math.round((pd(t)-pd(f))/864e5)+1;let ss=0,rp=0,mi=0,xp=0,se=0,ac=0;
-ks.forEach(k=>{const d=S.days[k];if(!dn(d))return;ac++;if('ABM'.includes(d.t)&&ms(d))se++;xp+=dx(k);for(const id in d.e){const e=d.e[id],x=X[id];if(!e.d||!x)continue;if(x.u=='мин'){if(id=='rn')mi+=e.s[0]||0}else{ss+=e.s.length;if(x.u=='пов')rp+=e.s.reduce((p,q)=>p+q,0)}}});
-const pk=k=>{let n=0;const d=S.days[k];if(d)for(const id in d.e){const e=d.e[id];if(e.d&&X[id]&&X[id].u!='мин')n+=e.s.length}return n},B=[],wk=days>45;
-for(let i=0;i<days;i+=wk?7:1){let v=0;for(let j=i;j<Math.min(days,i+(wk?7:1));j++)v+=pk(add(f,j));B.push({l:lb(add(f,i)),v})}
-const pr=Object.keys(X).filter(i=>i!='wu'&&i!='rn').map(i=>{const a=ser(i,f,t);if(a.length<2)return'';const q=a[a.length-1].v-a[0].v;return`${X[i].n}: ${a[0].v} → ${a[a.length-1].v} (${q>=0?'+':''}${q})`}).filter(Boolean),
-W=S.w.filter(z=>z.d>=f&&z.d<=t).map(z=>({k:z.d,v:z.kg})),plan=Math.round(days/7*3),
-tt=[`Период: ${f} — ${t} (${days} дн.)`,`Активных дней: ${ac}. Силовых тренировок: ${se} (по плану ≈ ${plan})`,`Подходов: ${ss}, повторов: ${rp}, кардио: ${mi} мин, XP: ${xp}`,...pr,W.length>1?`Вес: ${W[0].v} → ${W[W.length-1].v} кг`:'',se<plan*.7?'Совет: пропуски — не страшно. Делай следующую тренировку по очереди, без «двойных» дней; на занятой день есть Мини-15.':'Отличный ритм! Когда во всех подходах дойдёшь до верха диапазона — переходи на следующую ступень.'].filter(Boolean).join('\n');
-return`<div class="row">${[['7','7 дней'],['30','30 дней'],['90','90 дней'],['all','Всё время']].map(z=>`<button class="${R.p==z[0]?'on':''}" data-a="rg" data-i="${z[0]}">${z[1]}</button>`).join('')}</div><div class="row"><small>или свой период:</small><input type="date" id="f" value="${f}"><input type="date" id="to" value="${t}"></div><div class="g"><div><b>${se}</b><small>тренировок</small></div><div><b>${ac}/${days}</b><small>активных дней</small></div><div><b>${xp}</b><small>XP</small></div><div><b>${ss}</b><small>подходов</small></div><div><b>${rp}</b><small>повторов</small></div><div><b>${mi}</b><small>мин кардио</small></div></div><h3>Подходы по ${wk?'неделям':'дням'}</h3>${bars(B)}<h3>Рост результата</h3><div class="row"><select id="xs">${Object.keys(X).filter(i=>i!='wu').map(i=>`<option value="${i}"${i==R.ex?' selected':''}>${X[i].n}</option>`).join('')}</select></div>${line(ser(R.ex,f,t),X[R.ex].u=='с'?' с':'')}<small>Лучший подход за день</small><h3>Вес тела</h3><div class="row"><input type="number" id="wi" step="0.1" placeholder="кг" style="width:90px"><button data-a="w">Записать вес</button></div>${line(W.length>1?W:S.w.map(z=>({k:z.d,v:z.kg})),' кг')}<h3>Итоги периода</h3><pre>${tt}</pre>`}
-function render(){head();$('#m').innerHTML=tab=='t'?today():rep()}
-document.onclick=ev=>{const a=ev.target.closest('[data-a]');if(!a)return;const c=a.dataset.a,i=a.dataset.i;
-if(c=='t')tab=i;else if(c=='dn')cur=i=='0'?dk():add(cur,+i);else if(c=='o')op=op==i?null:i;
-else if(c=='+'){const n=a.parentNode.querySelectorAll('input');a.insertAdjacentHTML('beforebegin','<input type="number" inputmode="numeric" min="0" value="'+(n.length?n[n.length-1].value:0)+'">');return}
-else if(c=='rg')R.p=i;
-else if(c=='w'){const v=parseFloat($('#wi').value);if(!v)return;S.w=S.w.filter(z=>z.d!=dk()).concat({d:dk(),kg:v}).sort((p,q)=>p.d<q.d?-1:1);sm()}
-else if(c=='ld'){const l=X[i].L.length;S.st[i]=Math.max(0,Math.min(l-1,(S.st[i]||0)+ +a.dataset.d));sm()}
-else{const d=S.days[cur]||(S.days[cur]={t:typ(cur),e:{}});
-if(c=='ty')d.t=i;
-else if(c=='q'){const x=X[i];if(ok(d,i))delete d.e[i];else d.e[i]={s:Array(d.t=='M'?2:x.s).fill(P(x.r)),d:1}}
-else if(c=='s'){const v=[...a.closest('.bd').querySelectorAll('input')].map(z=>P(z.value));if(!v.length)return;d.e[i]={s:v,d:1}}
-else if(c=='r')delete d.e[i];
-sv(cur)}
-render()};
-document.onchange=ev=>{const z=ev.target;if(z.id=='xs')R.ex=z.value;else if(z.id=='f'||z.id=='to'){let f=$('#f').value,t=$('#to').value;if(!f||!t)return;if(f>t)[f,t]=[t,f];R.p='c';R.f=f;R.to=t}else return;render()};
-document.onvisibilitychange=()=>{if(!document.hidden&&dk()!=td0){td0=cur=dk();render()}};
-render();
-(async()=>{try{const[db,u]=await Promise.all([claude.use('db'),claude.use('user')]);if(!db||!u)return;const id=await u.id();if(!id)return;const c=db.collection('data/users/'+id);let first=true;
-c.onSnapshot(sn=>{const seen={};sn.docs.forEach(z=>{seen[z.id]=1;const v=z.data()||{};if(z.id=='meta'){S.w=v.w||[];S.st=v.st||{}}else if(z.id.startsWith('d-'))S.days[z.id.slice(2)]={t:v.t||'R',e:v.e||{}}});
-if(first){first=false;col=c;Object.keys(S.days).forEach(k=>{if(!seen['d-'+k])sv(k)});if(!seen.meta&&(S.w.length||Object.keys(S.st).length))sm()}
-ls();const a=document.activeElement;if(!a||a.tagName!='INPUT')render()},()=>{})}catch(e){}})();
-</script></body></html>
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Фит-квест</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <div class="w">
+            <div id="hd"></div>
+            <div class="tabs"><button data-a="t" data-i="t">Сегодня</button><button data-a="t" data-i="r">Отчёт</button>
+            </div>
+        </div>
+    </header>
+    <main class="w" id="m"></main>
+
+    <script src="scripts.js"></script>
+</body>
+
+</html>
